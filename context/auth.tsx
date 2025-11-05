@@ -38,6 +38,9 @@ type AuthContextType = {
   user: UserType | null;
   loading: boolean;
   signInWithGoogle: () => Promise<{ data: any | null; error: Error | null }>;
+  signInWithPhone: (phone: string) => Promise<{ data: any | null; error: Error | null }>;
+  verifyOTP: (phone: string, token: string) => Promise<{ data: any | null; error: Error | null }>;
+  testLogin: () => void;
   signOut: () => Promise<void>;
 };
 
@@ -72,7 +75,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       // Create the redirect URI using expo-auth-session
       const redirectUri = makeRedirectUri({
-        scheme: 'salonbookingapp',
+        scheme: 'home-bonzenga',
         path: 'auth-callback'
       });
 
@@ -95,6 +98,64 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  const signInWithPhone = async (phone: string) => {
+    try {
+      const { data, error } = await supabase.auth.signInWithOtp({
+        phone: phone,
+      });
+      return { data, error };
+    } catch (error) {
+      console.error('Error in signInWithPhone:', error);
+      return { data: null, error: error as Error };
+    }
+  };
+
+  const verifyOTP = async (phone: string, token: string) => {
+    try {
+      const { data, error } = await supabase.auth.verifyOtp({
+        phone: phone,
+        token: token,
+        type: 'sms',
+      });
+      return { data, error };
+    } catch (error) {
+      console.error('Error in verifyOTP:', error);
+      return { data: null, error: error as Error };
+    }
+  };
+
+  const testLogin = () => {
+    // Create a mock user for testing purposes
+    const mockUser: UserType = {
+      id: 'test-user-123',
+      phone: '+1234567890',
+      email: 'test@example.com',
+      app_metadata: {
+        provider: 'test',
+        providers: ['test'],
+      },
+      user_metadata: {
+        name: 'Test User',
+      },
+      aud: 'authenticated',
+      role: 'authenticated',
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    };
+
+    const mockSession: SessionType = {
+      access_token: 'mock-access-token',
+      refresh_token: 'mock-refresh-token',
+      expires_in: 3600,
+      expires_at: Date.now() + 3600000,
+      token_type: 'bearer',
+      user: mockUser,
+    };
+
+    setSession(mockSession);
+    setUser(mockUser);
+  };
+
   const signOut = async () => {
     await supabase.auth.signOut();
   };
@@ -104,6 +165,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     user,
     loading,
     signInWithGoogle,
+    signInWithPhone,
+    verifyOTP,
+    testLogin,
     signOut,
   };
 

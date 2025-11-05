@@ -1,5 +1,4 @@
 import SplashScreen from '@/components/splash-screen';
-import { useAuth } from '@/context/auth';
 import { useFocusEffect } from '@react-navigation/native';
 import { Stack, router, useNavigation } from 'expo-router';
 import { useCallback, useEffect, useState } from 'react';
@@ -7,7 +6,6 @@ import { StyleSheet, View } from 'react-native';
 
 export default function AppLayout() {
   const [showSplash, setShowSplash] = useState(true);
-  const { user } = useAuth();
   const navigation = useNavigation();
 
   // Prevent going back to splash screen
@@ -23,14 +21,11 @@ export default function AppLayout() {
   useEffect(() => {
     const timer = setTimeout(() => {
       setShowSplash(false);
-      if (user) {
-        router.replace('/(app)/home');
-      } else {
-        router.replace('/(auth)/sign-in');
-      }
+      // Skip authentication - go directly to app
+      router.replace('/(app)/home');
     }, 1600);
     return () => clearTimeout(timer);
-  }, [user]);
+  }, []);
 
   if (showSplash) {
     return <SplashScreen />;
@@ -59,7 +54,7 @@ export default function AppLayout() {
           }}
         />
         <Stack.Screen
-          name="home"
+          name="(app)"
           options={{
             animation: 'fade_from_bottom',
             gestureEnabled: false,

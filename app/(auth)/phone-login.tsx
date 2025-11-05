@@ -33,7 +33,9 @@ export default function PhoneLoginScreen() {
       setErrorMsg(result.error.message || 'Failed to send OTP. Please try again.');
       setLoading(false);
       return;
-    }    console.log('OTP sent successfully');
+    }
+    
+    console.log('OTP sent successfully');
     router.push({
       pathname: '/verify-otp',
       params: { phone: formattedPhone }

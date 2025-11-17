@@ -28,7 +28,7 @@ export const signInWithGoogle = async () => {
           prompt: 'consent',
         },
         redirectTo: Platform.select({
-          native: 'salonbookingapp://', // Your app's deep link URL
+          native: 'home-bonzenga://', // Your app's deep link URL
           default: 'exp://localhost:8081',
         }),
         skipBrowserRedirect: true, // Important for mobile flow

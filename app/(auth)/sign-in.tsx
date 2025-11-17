@@ -3,11 +3,12 @@ import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { useAuth } from '@/context/auth';
 import * as Linking from 'expo-linking';
+import { router } from 'expo-router';
 import * as WebBrowser from 'expo-web-browser';
-import { Alert, Image, StyleSheet, TouchableOpacity } from 'react-native';
+import { Alert, Image, StyleSheet, TouchableOpacity, View } from 'react-native';
 
 export default function SignInScreen() {
-  const { signInWithGoogle } = useAuth();
+  const { signInWithGoogle, testLogin } = useAuth();
 
   const handleGoogleSignIn = async () => {
     try {
@@ -56,6 +57,11 @@ export default function SignInScreen() {
     }
   };
 
+  const handleTestLogin = () => {
+    testLogin();
+    router.replace('/(app)/home');
+  };
+
   return (
     <ThemedView style={styles.container}>
       <Image
@@ -65,18 +71,29 @@ export default function SignInScreen() {
       />
       <ThemedText style={styles.title}>Welcome Back</ThemedText>
       <ThemedText style={styles.subtitle}>
-        Sign in with your Google account to continue
+        Choose your preferred sign-in method
       </ThemedText>
 
-      <TouchableOpacity 
-        style={styles.googleButton}
-        onPress={handleGoogleSignIn}
-      >
-        <GoogleIcon size={24} />
-        <ThemedText style={styles.googleButtonText}>
-          Continue with Google
-        </ThemedText>
-      </TouchableOpacity>
+      <View style={styles.buttonContainer}>
+        <TouchableOpacity 
+          style={styles.googleButton}
+          onPress={handleGoogleSignIn}
+        >
+          <GoogleIcon size={24} />
+          <ThemedText style={styles.googleButtonText}>
+            Continue with Google
+          </ThemedText>
+        </TouchableOpacity>
+
+        <TouchableOpacity 
+          style={styles.testButton}
+          onPress={handleTestLogin}
+        >
+          <ThemedText style={styles.testButtonText}>
+            🚀 Test Login
+          </ThemedText>
+        </TouchableOpacity>
+      </View>
     </ThemedView>
   );
 }
@@ -107,11 +124,15 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     opacity: 0.8,
   },
+  buttonContainer: {
+    width: '100%',
+    maxWidth: 300,
+  },
   googleButton: {
     flexDirection: 'row',
     backgroundColor: '#ffffff',
     paddingHorizontal: 24,
-    paddingVertical: 12,
+    paddingVertical: 15,
     borderRadius: 30,
     alignItems: 'center',
     justifyContent: 'center',
@@ -124,7 +145,26 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 3,
     width: '100%',
-    maxWidth: 300,
+    borderWidth: 1,
+    borderColor: '#E0E0E0',
+  },
+  testButton: {
+    backgroundColor: '#4E342E',
+    paddingHorizontal: 24,
+    paddingVertical: 15,
+    borderRadius: 30,
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: '100%',
+    marginTop: 15,
+    shadowColor: '#4E342E',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 3,
   },
   googleIcon: {
     width: 24,
@@ -133,6 +173,11 @@ const styles = StyleSheet.create({
   },
   googleButtonText: {
     color: '#4E342E',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  testButtonText: {
+    color: '#ffffff',
     fontSize: 16,
     fontWeight: '600',
   },

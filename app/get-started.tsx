@@ -6,7 +6,7 @@ import { StyleSheet, TouchableOpacity, View } from 'react-native';
 
 export default function GetStartedScreen() {
   const handleGetStarted = () => {
-    Router.push('/phone-login');
+    Router.push('/(app)/home');
   };
 
   return (

@@ -1,111 +1,267 @@
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { useAuth } from '@/context/auth';
-import { Ionicons } from '@expo/vector-icons';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { SalonColors } from '@/constants/theme';
 import { useRouter } from 'expo-router';
-import { StyleSheet, TouchableOpacity, View } from 'react-native';
+import React, { useState } from 'react';
+import { Alert, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 export default function ProfileScreen() {
   const router = useRouter();
-  const { user, signOut } = useAuth();
+  const [isEditing, setIsEditing] = useState(false);
+  const [profile, setProfile] = useState({
+    name: 'John Doe',
+    phone: '+91 9876543210',
+    email: 'john.doe@example.com',
+  });
 
-  const handleSignOut = async () => {
-    await signOut();
-    router.replace('/');
+  const handleSave = () => {
+    setIsEditing(false);
+    Alert.alert('Success', 'Profile updated successfully');
   };
 
+  const handleLogout = () => {
+    Alert.alert(
+      'Logout',
+      'Are you sure you want to logout?',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Logout',
+          style: 'destructive',
+          onPress: () => {
+            // Navigate to login screen
+            router.replace('/(auth)/login' as any);
+          },
+        },
+      ]
+    );
+  };
+
+  const menuItems = [
+    { id: '1', title: 'Saved Addresses', icon: '📍', route: null },
+    { id: '2', title: 'Payment Methods', icon: '💳', route: null },
+    { id: '3', title: 'Notifications', icon: '🔔', route: null },
+    { id: '4', title: 'Help & Support', icon: '❓', route: null },
+    { id: '5', title: 'Terms & Conditions', icon: '📄', route: null },
+    { id: '6', title: 'Privacy Policy', icon: '🔒', route: null },
+  ];
+
   return (
-    <ThemedView style={styles.container}>
+    <View style={styles.container}>
       <View style={styles.header}>
-        <TouchableOpacity 
-          style={styles.backButton}
-          onPress={() => router.back()}
-        >
-          <Ionicons name="chevron-back" size={28} color="#4E342E" />
-        </TouchableOpacity>
-        <ThemedText style={styles.title}>Profile</ThemedText>
+        <Text style={styles.title}>Profile & Settings</Text>
       </View>
 
-      <View style={styles.content}>
-        <View style={styles.profileInfo}>
-          <View style={styles.avatarContainer}>
-            <Ionicons name="person" size={60} color="#4E342E" />
+      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+        <Card style={styles.profileCard}>
+          <View style={styles.avatar}>
+            <Text style={styles.avatarText}>
+              {profile.name.split(' ').map((n) => n[0]).join('')}
+            </Text>
           </View>
-          <ThemedText style={styles.phone}>{user?.phone}</ThemedText>
+
+          {isEditing ? (
+            <View style={styles.form}>
+              <Input
+                label="Name"
+                value={profile.name}
+                onChangeText={(text) => setProfile({ ...profile, name: text })}
+              />
+              <Input
+                label="Phone"
+                value={profile.phone}
+                keyboardType="phone-pad"
+                onChangeText={(text) => setProfile({ ...profile, phone: text })}
+              />
+              <Input
+                label="Email"
+                value={profile.email}
+                keyboardType="email-address"
+                onChangeText={(text) => setProfile({ ...profile, email: text })}
+              />
+              <View style={styles.editActions}>
+                <Button
+                  title="Cancel"
+                  onPress={() => setIsEditing(false)}
+                  variant="outline"
+                  style={styles.editButton}
+                />
+                <Button
+                  title="Save"
+                  onPress={handleSave}
+                  style={styles.editButton}
+                />
+              </View>
+            </View>
+          ) : (
+            <View style={styles.profileInfo}>
+              <Text style={styles.profileName}>{profile.name}</Text>
+              <Text style={styles.profileDetail}>{profile.phone}</Text>
+              <Text style={styles.profileDetail}>{profile.email}</Text>
+              <Button
+                title="Edit Profile"
+                onPress={() => setIsEditing(true)}
+                variant="outline"
+                style={styles.editProfileButton}
+              />
+            </View>
+          )}
+        </Card>
+
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Settings</Text>
+          {menuItems.map((item) => (
+            <TouchableOpacity
+              key={item.id}
+              style={styles.menuItem}
+              onPress={() => {
+                if (item.route) {
+                  router.push(item.route as any);
+                } else {
+                  Alert.alert('Coming Soon', `${item.title} feature coming soon!`);
+                }
+              }}
+            >
+              <View style={styles.menuLeft}>
+                <Text style={styles.menuIcon}>{item.icon}</Text>
+                <Text style={styles.menuTitle}>{item.title}</Text>
+              </View>
+              <Text style={styles.menuArrow}>›</Text>
+            </TouchableOpacity>
+          ))}
         </View>
 
-        <TouchableOpacity 
-          style={styles.signOutButton}
-          onPress={handleSignOut}
-        >
-          <ThemedText style={styles.signOutText}>Sign Out</ThemedText>
-        </TouchableOpacity>
-      </View>
-    </ThemedView>
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>About</Text>
+          <Card style={styles.aboutCard}>
+            <Text style={styles.aboutText}>Version 1.0.0</Text>
+            <Text style={styles.aboutText}>© 2025 Salon Booking App</Text>
+          </Card>
+        </View>
+
+        <Button
+          title="Logout"
+          onPress={handleLogout}
+          variant="outline"
+          style={styles.logoutButton}
+        />
+      </ScrollView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F3EFE9',
+    backgroundColor: SalonColors.background,
   },
   header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 20,
+    paddingHorizontal: 24,
     paddingTop: 60,
-    paddingBottom: 20,
-  },
-  backButton: {
-    padding: 8,
-    marginRight: 8,
+    paddingBottom: 24,
   },
   title: {
     fontSize: 28,
     fontWeight: 'bold',
-    color: '#4E342E',
+    color: SalonColors.textPrimary,
   },
   content: {
     flex: 1,
-    paddingHorizontal: 20,
+    paddingHorizontal: 24,
+  },
+  profileCard: {
+    alignItems: 'center',
+    marginBottom: 24,
+  },
+  avatar: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: SalonColors.primary,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 16,
+  },
+  avatarText: {
+    fontSize: 32,
+    fontWeight: 'bold',
+    color: SalonColors.white,
   },
   profileInfo: {
     alignItems: 'center',
-    marginTop: 40,
+    width: '100%',
   },
-  avatarContainer: {
-    width: 120,
-    height: 120,
-    borderRadius: 60,
-    backgroundColor: '#fff',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 20,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  phone: {
-    fontSize: 18,
-    color: '#4E342E',
+  profileName: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: SalonColors.textPrimary,
     marginBottom: 8,
   },
-  signOutButton: {
-    backgroundColor: '#4E342E',
-    paddingVertical: 16,
-    borderRadius: 12,
-    alignItems: 'center',
-    marginTop: 40,
+  profileDetail: {
+    fontSize: 14,
+    color: SalonColors.textSecondary,
+    marginBottom: 4,
   },
-  signOutText: {
-    color: '#fff',
-    fontSize: 16,
+  editProfileButton: {
+    marginTop: 16,
+    width: '100%',
+  },
+  form: {
+    width: '100%',
+  },
+  editActions: {
+    flexDirection: 'row',
+    gap: 12,
+    marginTop: 8,
+  },
+  editButton: {
+    flex: 1,
+  },
+  section: {
+    marginBottom: 24,
+  },
+  sectionTitle: {
+    fontSize: 18,
     fontWeight: '600',
+    color: SalonColors.textPrimary,
+    marginBottom: 12,
+  },
+  menuItem: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    backgroundColor: SalonColors.white,
+    padding: 16,
+    borderRadius: 12,
+    marginBottom: 8,
+  },
+  menuLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  menuIcon: {
+    fontSize: 20,
+  },
+  menuTitle: {
+    fontSize: 16,
+    color: SalonColors.textPrimary,
+  },
+  menuArrow: {
+    fontSize: 24,
+    color: SalonColors.textLight,
+    fontWeight: '300',
+  },
+  aboutCard: {
+    alignItems: 'center',
+  },
+  aboutText: {
+    fontSize: 14,
+    color: SalonColors.textSecondary,
+    marginBottom: 4,
+  },
+  logoutButton: {
+    marginBottom: 40,
   },
 });

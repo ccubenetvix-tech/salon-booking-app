@@ -5,7 +5,7 @@ import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, View } from 'react-native';
 
-export default function PhoneLoginScreen() {
+export default function LoginScreen() {
   const router = useRouter();
   const [phoneNumber, setPhoneNumber] = useState('');
   const [error, setError] = useState('');
@@ -35,7 +35,7 @@ export default function PhoneLoginScreen() {
     setTimeout(() => {
       setLoading(false);
       router.push({
-        pathname: '/verify-otp',
+        pathname: '/(auth)/verify-otp',
         params: { phone: phoneNumber },
       });
     }, 1000);

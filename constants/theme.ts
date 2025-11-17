@@ -27,6 +27,26 @@ export const Colors = {
   },
 };
 
+// Salon App Specific Colors
+export const SalonColors = {
+  primary: '#8B5CF6', // Purple
+  primaryDark: '#7C3AED',
+  secondary: '#EC4899', // Pink
+  accent: '#F59E0B', // Amber
+  success: '#10B981',
+  error: '#EF4444',
+  warning: '#F59E0B',
+  background: '#F3EFE9',
+  surface: '#FFFFFF',
+  surfaceLight: '#F9FAFB',
+  border: '#E5E7EB',
+  textPrimary: '#1F2937',
+  textSecondary: '#6B7280',
+  textLight: '#9CA3AF',
+  white: '#FFFFFF',
+  black: '#000000',
+};
+
 export const Fonts = Platform.select({
   ios: {
     /** iOS `UIFontDescriptorSystemDesignDefault` */

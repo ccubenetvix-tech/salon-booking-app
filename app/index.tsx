@@ -1,66 +1,33 @@
-import SplashScreen from '@/components/splash-screen';
-import { useFocusEffect } from '@react-navigation/native';
-import { Stack, router, useNavigation } from 'expo-router';
-import { useCallback, useEffect, useState } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { SalonColors } from '@/constants/theme';
+import { useRouter } from 'expo-router';
+import React, { useEffect } from 'react';
+import { ActivityIndicator, Image, StyleSheet, Text, View } from 'react-native';
 
-export default function AppLayout() {
-  const [showSplash, setShowSplash] = useState(true);
-  const navigation = useNavigation();
-
-  // Prevent going back to splash screen
-  useFocusEffect(
-    useCallback(() => {
-      navigation.setOptions({
-        headerShown: false,
-        gestureEnabled: false,
-      });
-    }, [navigation])
-  );
+export default function SplashScreen() {
+  const router = useRouter();
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      setShowSplash(false);
-      // Skip authentication - go directly to app
-      router.replace('/(app)/home');
-    }, 1600);
+      router.replace('/onboarding' as any);
+    }, 2000);
+
     return () => clearTimeout(timer);
   }, []);
 
-  if (showSplash) {
-    return <SplashScreen />;
-  }
-
   return (
     <View style={styles.container}>
-      <Stack
-        screenOptions={{
-          headerShown: false,
-          animation: 'fade',
-          contentStyle: { backgroundColor: '#F3EFE9' },
-        }}
-      >
-        <Stack.Screen
-          name="get-started"
-          options={{
-            gestureEnabled: false,
-          }}
-        />
-        <Stack.Screen
-          name="(auth)"
-          options={{
-            animation: 'slide_from_bottom',
-            gestureEnabled: false,
-          }}
-        />
-        <Stack.Screen
-          name="(app)"
-          options={{
-            animation: 'fade_from_bottom',
-            gestureEnabled: false,
-          }}
-        />
-      </Stack>
+      <Image
+        source={require('@/assets/images/splash-logo.jpg')}
+        style={styles.logo}
+        resizeMode="contain"
+      />
+      <Text style={styles.title}>Salon Booking</Text>
+      <Text style={styles.subtitle}>Your beauty, our priority</Text>
+      <ActivityIndicator
+        size="large"
+        color={SalonColors.primary}
+        style={styles.loader}
+      />
     </View>
   );
 }
@@ -68,6 +35,28 @@ export default function AppLayout() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F3EFE9',
+    backgroundColor: SalonColors.background,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  logo: {
+    width: 150,
+    height: 150,
+    marginBottom: 24,
+    borderRadius: 75,
+  },
+  title: {
+    fontSize: 36,
+    fontWeight: 'bold',
+    color: SalonColors.textPrimary,
+    marginBottom: 8,
+  },
+  subtitle: {
+    fontSize: 16,
+    color: SalonColors.textSecondary,
+    marginBottom: 40,
+  },
+  loader: {
+    marginTop: 20,
   },
 });
